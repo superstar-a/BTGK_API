@@ -81,14 +81,77 @@ app.get('/profile', (req, res) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Profile</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+          }
+          .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+          }
+          h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          p {
+            font-size: 18px;
+            margin: 10px 0;
+          }
+          img {
+            display: block;
+            margin: 20px auto;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+          }
+          h2 {
+            color: #555;
+            margin-top: 30px;
+          }
+          pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+            border: 1px solid #ddd;
+          }
+          a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4267B2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+          }
+          a:hover {
+            background-color: #365899;
+          }
+        </style>
       </head>
       <body>
-        <h1>Welcome, ${name}!</h1>
-        <p><strong>Email:</strong> ${email}</p>
-        ${avatar ? `<img src="${avatar}" alt="Avatar" style="width:100px;height:100px;">` : ''}
-        <h2>API Result (JSON):</h2>
-        <pre>${JSON.stringify(apiResult, null, 2)}</pre>
-        <a href="/logout">Logout</a>
+        <div class="container">
+          <h1>Welcome, ${name}!</h1>
+          <p><strong>Email:</strong> ${email}</p>
+          ${avatar ? `<img src="${avatar}" alt="Avatar">` : ''}
+          <h2>API Result (JSON):</h2>
+          <pre>${JSON.stringify(apiResult, null, 2)}</pre>
+          <a href="/logout">Logout</a>
+        </div>
       </body>
       </html>
     `);
