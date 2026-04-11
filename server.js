@@ -2,12 +2,13 @@ const express = require('express');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
+require('dotenv').config();  // Load biến từ file .env
 
 const app = express();
 
-// Replace with your Facebook App ID and Secret
-const FACEBOOK_APP_ID = '1450935356512078';
-const FACEBOOK_APP_SECRET = 'e1005b984c30916be92b19b0488bf6e6';
+// Lấy thông tin từ file .env
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 
 passport.use(new FacebookStrategy({
   clientID: FACEBOOK_APP_ID,
