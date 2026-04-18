@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facebook Page API Explorer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.08);
+      padding: 30px;
+    }
+    h1 {
+      margin-top: 0;
+      color: #222;
+    }
+    .field-group {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #444;
+      font-weight: 600;
+    }
+    input, textarea, button, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
+      background: #4267B2;
+      color: white;
+      border: none;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #365899;
+    }
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    pre {
+      background: #f1f3f5;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 18px;
+      overflow-x: auto;
+      max-height: 540px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .note {
+      font-size: 14px;
+      color: #555;
+      margin-top: 0;
+      margin-bottom: 18px;
+    }
+    .top-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #4267B2;
+      text-decoration: none;
+    }
+    .top-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="top-link" href="/">← Trở về trang chính</a>
+    <h1>Facebook Page API Explorer</h1>
+    <p class="note">Sử dụng các API backend của server để gọi Facebook Page Graph API và xem kết quả trả về.</p>
+
+    <div class="field-group">
+      <div>
+        <label for="pageId">Page ID</label>
+        <input id="pageId" type="text" placeholder="Nhập pageId" />
+      </div>
+      <div>
+        <label for="postId">Post ID</label>
+        <input id="postId" type="text" placeholder="Nhập postId để xóa/ xem bình luận/ likes" />
+      </div>
+    </div>
+    <p class="note">Chú ý: chỉ những Page ID hiển thị trong <strong>Debug /me/accounts</strong> mới truy cập được với token hiện tại.</p>
+
+    <div class="field-group">
+      <div>
+        <label for="message">Message (POST /posts)</label>
+        <textarea id="message" rows="3" placeholder="Nội dung bài đăng mới"></textarea>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="createPostBtn">Tạo bài đăng</button>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button id="getPageBtn">GET /api/page/{pageId}</button>
+      <button id="getPostsBtn">GET /api/page/{pageId}/posts</button>
+      <button id="deletePostBtn">DELETE /api/page/post/{postId}</button>
+      <button id="getCommentsBtn">GET /api/page/post/{postId}/comments</button>
+      <button id="getLikesBtn">GET /api/page/post/{postId}/likes</button>
+      <button id="getInsightsBtn">GET /api/page/{pageId}/insights</button>
+    </div>
+
+    <div class="button-row">
+      <button id="debugMeBtn">Debug /me</button>
+      <button id="debugAccountsBtn">Debug /me/accounts</button>
+      <button id="debugTokenBtn">Debug token</button>
+    </div>
+
+    <h2>Kết quả</h2>
+    <pre id="output">Chưa có kết quả.</pre>
+  </div>
+
+  <script>
+    const output = document.getElementById('output');
+    const pageIdInput = document.getElementById('pageId');
+    const postIdInput = document.getElementById('postId');
+    const messageInput = document.getElementById('message');
+
+    function showResult(data) {
+      output.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function showError(error) {
+      output.textContent = `Error: ${error}`;
+    }
+
+    function getPageId() {
+      return pageIdInput.value.trim();
+    }
+
+    function getPostId() {
+      return postIdInput.value.trim();
+    }
+
+    async function call(path, options = {}) {
+      try {
+        output.textContent = 'Đang gọi API...';
+        const response = await fetch(path, options);
+        const data = await response.json();
+        if (!response.ok) {
+          showError(data.error || response.statusText);
+          return;
+        }
+        showResult(data);
+      } catch (err) {
+        showError(err.message || err);
+      }
+    }
+
+    document.getElementById('getPageBtn').addEventListener('click', () => {
+      const pageId = getPageId();
+      if (!pageId) return showError('Cần nhập pageId');
+      call(`/api/page/${encodeURIComponent(pageId)}`);
+    });
+
+    document.getElementById('getPostsBtn').addEventListener('click', () => {
+      const pageId = getPageId();
+      if (!pageId) return showError('Cần nhập pageId');
+      call(`/api/page/${encodeURIComponent(pageId)}/posts`);
+    });
+
+    document.getElementById('createPostBtn').addEventListener('click', () => {
+      const pageId = getPageId();
+      const message = messageInput.value.trim();
+      if (!pageId) return showError('Cần nhập pageId');
+      if (!message) return showError('Cần nhập message để tạo bài đăng');
+      call(`/api/page/${encodeURIComponent(pageId)}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+    });
+
+    document.getElementById('deletePostBtn').addEventListener('click', () => {
+      const postId = getPostId();
+      if (!postId) return showError('Cần nhập postId');
+      call(`/api/page/post/${encodeURIComponent(postId)}`, {
+        method: 'DELETE'
+      });
+    });
+
+    document.getElementById('getCommentsBtn').addEventListener('click', () => {
+      const postId = getPostId();
+      if (!postId) return showError('Cần nhập postId');
+      call(`/api/page/post/${encodeURIComponent(postId)}/comments`);
+    });
+
+    document.getElementById('getLikesBtn').addEventListener('click', () => {
+      const postId = getPostId();
+      if (!postId) return showError('Cần nhập postId');
+      call(`/api/page/post/${encodeURIComponent(postId)}/likes`);
+    });
+
+    document.getElementById('getInsightsBtn').addEventListener('click', () => {
+      const pageId = getPageId();
+      if (!pageId) return showError('Cần nhập pageId');
+      call(`/api/page/${encodeURIComponent(pageId)}/insights`);
+    });
+
+    document.getElementById('debugMeBtn').addEventListener('click', () => {
+      call('/api/debug/me');
+    });
+
+    document.getElementById('debugAccountsBtn').addEventListener('click', () => {
+      call('/api/debug/accounts');
+    });
+
+    document.getElementById('debugTokenBtn').addEventListener('click', () => {
+      call('/api/debug/token');
+    });
+  </script>
+</body>
+</html>

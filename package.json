@@ -11,6 +11,7 @@
     "passport": "^0.6.0",
     "passport-facebook": "^3.0.0",
     "express-session": "^1.17.3",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "node-fetch": "^2.6.7"
   }
 }
